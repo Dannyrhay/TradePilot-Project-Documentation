@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradePilot - Project Documentation</title>
+    <link rel="icon" href="https://img.icons8.com/?size=100&id=Y4lyJQODpHWN&format=png&color=000000">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        /* --- MODIFIED: Centered and Bold Headings --- */
+        h1, h2, h3, h4, h5 {
+            font-weight: 800; /* Extra-bold for clarity */
+            color: #0f172a;
+            text-align: center; /* Centered by default */
+        }
+        h2 {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+            margin-bottom: 2rem;
+            margin-top: 3.5rem;
+            font-size: 1.875rem;
+            letter-spacing: -0.025em;
+        }
+        h3 {
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        h4 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        h5 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+        /* --- ADDED: Exception for sidebar heading --- */
+        #aside-nav h3 {
+            text-align: left;
+            font-weight: 600; /* font-semibold */
+        }
+        p, ul, ol {
+            line-height: 1.75;
+            margin-bottom: 1.25rem;
+        }
+        code {
+            background-color: #e2e8f0;
+            color: #1e293b;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.375rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.25rem;
+            text-align: left; /* Keep code blocks left-aligned */
+        }
+        pre > code {
+            background-color: transparent;
+            padding: 0;
+            white-space: pre;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            margin-top: 1.5rem;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        thead {
+            background-color: #f1f5f9;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #fcfdff;
+        }
+        .aside-nav a.active {
+            color: #2563eb;
+            font-weight: 600;
+            border-left-color: #2563eb;
+        }
+        .aside-nav a {
+            transition: all 0.2s ease-in-out;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-header .accordion-icon {
+            transition: transform 0.3s ease-out;
+        }
+        section {
+            scroll-margin-top: 5rem;
+            margin-bottom: 4rem;
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            background-color: #1e40af;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .step-content {
+            padding-top: 0.25rem;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #1e40af;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .cta-button:hover {
+            background-color: #1d4ed8;
+        }
+        /* Styles for the mobile sidebar */
+        body.menu-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Mobile Sidebar -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-40 hidden transition-opacity duration-300"></div>
+
+    <div id="mobile-menu" class="fixed top-0 left-0 h-full w-72 bg-slate-900 text-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="p-4 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-white font-bold text-xl tracking-wider">
+                    TradePilot Docs
+                </span>
+                <button id="close-menu-button" class="text-slate-300 hover:text-white">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <nav id="mobile-nav-content" class="flex-grow overflow-y-auto space-y-2">
+                <!-- Mobile nav links will be injected here by JavaScript -->
+            </nav>
+        </div>
+    </div>
+
+
+    <header id="navbar" class="bg-slate-900/90 backdrop-blur-sm sticky top-0 z-30 w-full border-b border-slate-700 transition-shadow duration-300">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <a href="#" class="flex items-center space-x-2">
+                <span class="text-white font-bold text-xl tracking-wider">
+                    TradePilot Docs
+                </span>
+            </a>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-slate-200 hover:text-white focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+
+            <main class="lg:col-span-9 main-content">
+                <section id="introduction">
+                    <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Project Documentation: TradePilot</h1>
+                    <p class="text-xl text-slate-500 text-center">This document provides a comprehensive overview of the TradePilot project, from formal project management artifacts to detailed technical specifications and user guides.</p>
+                </section>
+
+                <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg my-8">
+                    <h2 class="text-2xl mt-0 border-none">I. Project Management Documentation</h2>
+                    <p class="!mb-0 text-center">This section contains the formal documents that define and govern the TradePilot project.</p>
+                </div>
+
+                <section id="charter">
+                    <h3 class="mt-0 text-2xl">1. Project Charter</h3>
+                    <ul class="list-disc list-inside space-y-2 text-left">
+                        <li><strong>Project Title:</strong> TradePilot AI-Enhanced Trading Bot</li>
+                        <li><strong>Project Purpose:</strong> To develop a robust, automated trading application that leverages a multi-strategy consensus mechanism and machine learning validation to improve trading decision quality on the MetaTrader 5 platform.</li>
+                        <li><strong>Objectives:</strong>
+                            <ul class="list-['-_'] ml-6 space-y-1">
+                                <li>Develop a stable backend capable of managing MT5 connections and trade execution.</li>
+                                <li>Implement a minimum of seven distinct trading strategies.</li>
+                                <li>Create a web-based dashboard for real-time monitoring, control, and configuration.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+
+                <section id="plan">
+                    <h3 class="text-2xl">2. Project Plan (Template)</h3>
+                    <p class="text-center">This document outlines the high-level plan for the project's execution and delivery.</p>
+                    <div class="overflow-x-auto"><table class="table-auto">
+                        <thead><tr><th>Phase</th><th>Key Deliverables</th><th>Estimated Timeline</th></tr></thead>
+                        <tbody>
+                            <tr><td>Phase 1: Foundation & Core Logic</td><td>Backend server setup, MT5 connection, Basic trade execution logic.</td><td>4 Weeks</td></tr>
+                            <tr><td>Phase 2: Algorithm & ML Integration</td><td>Implementation of all strategies, MLValidator class, model training pipeline.</td><td>6 Weeks</td></tr>
+                            <tr><td>Phase 3: Frontend & UI</td><td>Development of the interactive web dashboard.</td><td>5 Weeks</td></tr>
+                            <tr><td>Phase 4: Testing & Deployment</td><td>Unit testing, integration testing, UAT, and final deployment.</td><td>3 Weeks</td></tr>
+                        </tbody>
+                    </table></div>
+                </section>
+
+                <section id="scope">
+                    <h3 class="text-2xl">3. Scope Statement</h3>
+                    <h4 class="text-left">Project Scope</h4>
+                    <ul class="list-disc list-inside text-left">
+                        <li><strong>Inclusions:</strong> Integration with MetaTrader 5, multi-strategy consensus, ML validation layer, Flask API, web dashboard, MongoDB logging, and a UI-based backtester.</li>
+                        <li><strong>Exclusions:</strong> Integration with platforms other than MT5, mobile-native applications, development of new custom indicators not already included, and provision of hosting infrastructure.</li>
+                    </ul>
+                </section>
+
+                <section id="wbs">
+                    <h3 class="text-2xl">4. Work Breakdown Structure (WBS)</h3>
+                    <p class="text-center">A high-level breakdown of project work into manageable components.</p>
+                    <ol class="list-decimal list-inside text-left max-w-md mx-auto">
+                        <li><strong>Project Management</strong></li>
+                        <li><strong>Backend Development</strong> (API, Core Logic, Utilities)</li>
+                        <li><strong>Algorithm Development</strong> (Strategies, ML Models)</li>
+                        <li><strong>Frontend Development</strong> (UI/UX, Interactivity)</li>
+                        <li><strong>Testing & QA</strong> (Unit, Integration, System)</li>
+                    </ol>
+                </section>
+
+                <section id="schedule">
+                    <h3 class="text-2xl">5. Schedule (Template)</h3>
+                    <div class="overflow-x-auto"><table>
+                        <thead><tr><th>Milestone</th><th>Planned End Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td>Backend Core Complete</td><td>End of Week 4</td><td>Pending</td></tr>
+                            <tr><td>ML Training Pipeline Functional</td><td>End of Week 10</td><td>Pending</td></tr>
+                            <tr><td>Dashboard UI Complete</td><td>End of Week 15</td><td>Pending</td></tr>
+                            <tr><td>Project Go-Live</td><td>End of Week 18</td><td>Pending</td></tr>
+                        </tbody>
+                    </table></div>
+                </section>
+
+                <section id="budget">
+                    <h3 class="text-2xl">6. Budget (Template)</h3>
+                    <div class="overflow-x-auto"><table>
+                        <thead><tr><th>Category</th><th>Description</th><th>Estimated Cost</th></tr></thead>
+                        <tbody>
+                            <tr><td>Personnel</td><td>Developer time</td><td>$15,000</td></tr>
+                            <tr><td>Software</td><td>Licenses, cloud services (e.g., VPS, MongoDB Atlas)</td><td>$2,000</td></tr>
+                            <tr><td>Contingency</td><td>15% for unforeseen risks</td><td>$2,550</td></tr>
+                            <tr><td class="font-bold">Total</td><td class="font-bold"></td><td class="font-bold">$19,550</td></tr>
+                        </tbody>
+                    </table></div>
+                </section>
+
+                <section id="resources">
+                    <h3 class="text-2xl">7. Resources</h3>
+                    <h4>Human Resources</h4>
+                    <ul class="list-disc list-inside text-left max-w-lg mx-auto">
+                        <li><strong>Project Manager:</strong> Oversees schedule, budget, and communication.</li>
+                        <li><strong>Lead Developer(s):</strong> Responsible for backend, frontend, and algorithm development.</li>
+                        <li><strong>QA Engineer:</strong> Responsible for testing and validation.</li>
+                    </ul>
+                     <h4 class="mt-6">Technological Resources</h4>
+                     <p class="text-center">The full technology stack is detailed in <a href="#design" class="text-blue-600 hover:underline">Section 13: Design Documents</a>.</p>
+                </section>
+
+                <section id="risk-management">
+                    <h3 class="text-2xl">8. Risk Management Plan</h3>
+                     <div class="overflow-x-auto"><table>
+                        <thead><tr><th>Risk Description</th><th>Probability</th><th>Impact</th><th>Mitigation Strategy</th></tr></thead>
+                        <tbody>
+                            <tr><td>MT5 API updates break compatibility</td><td>Low</td><td>High</td><td>Maintain a suite of integration tests; pin library versions.</td></tr>
+                            <tr><td>ML model overfitting</td><td>Medium</td><td>High</td><td>Use cross-validation; test on out-of-sample data.</td></tr>
+                            <tr><td>Scope creep from stakeholders</td><td>Medium</td><td>Medium</td><td>Adhere to Change Management Plan; clearly defined scope.</td></tr>
+                        </tbody>
+                    </table></div>
+                </section>
+
+                <section id="communication-plan">
+                    <h3 class="text-2xl">9. Communication Plan</h3>
+                     <div class="overflow-x-auto"><table>
+                        <thead><tr><th>Communication Type</th><th>Frequency</th><th>Audience</th><th>Channel</th></tr></thead>
+                        <tbody>
+                            <tr><td>Project Status Report</td><td>Weekly</td><td>All Stakeholders</td><td>Email</td></tr>
+                            <tr><td>Team Stand-up</td><td>Daily</td><td>Development Team</td><td>Meeting</td></tr>
+                        </tbody>
+                    </table></div>
+                </section>
+
+                <section id="change-management">
+                    <h3 class="text-2xl">10. Change Management Plan</h3>
+                     <ol class="list-decimal list-inside text-left max-w-2xl mx-auto">
+                        <li>A formal Change Request must be submitted.</li>
+                        <li>The Project Manager will analyze the impact of the change.</li>
+                        <li>The Change Control Board will approve or deny the request.</li>
+                        <li>If approved, the Project Plan and relevant documents will be updated.</li>
+                     </ol>
+                </section>
+
+                <section id="status-reports">
+                    <h3 class="text-2xl">11. Status Reports (Template)</h3>
+                     <ul class="list-disc list-inside text-left max-w-lg mx-auto">
+                        <li><strong>Reporting Period:</strong> Week of [Date]</li>
+                        <li><strong>Overall Status:</strong> 🟢 Green / 🟡 Yellow / 🔴 Red</li>
+                        <li><strong>Accomplishments This Period:</strong> [List of completed tasks]</li>
+                        <li><strong>Risks/Issues/Blockers:</strong> [Description of any challenges]</li>
+                     </ul>
+                </section>
+
+                <section id="lessons-learned">
+                    <h3 class="text-2xl">12. Lessons Learned</h3>
+                     <ul class="list-disc list-inside text-left max-w-lg mx-auto">
+                        <li><strong>What went well:</strong> The use of an in-memory data cache significantly improved performance.</li>
+                        <li><strong>What could be improved:</strong> More comprehensive unit tests for strategies should be written earlier.</li>
+                     </ul>
+                </section>
+
+                <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg my-8">
+                    <h2 class="text-2xl mt-0 border-none">II. Product & Technical Documentation</h2>
+                    <p class="!mb-0 text-center">This section contains the practical guides for using and configuring the bot.</p>
+                </div>
+
+                <section id="design">
+                    <h3 class="mt-0 text-2xl">13. Design Documents</h3>
+
+                    <h4>System Architecture</h4>
+                    <h5>High-Level Overview</h5>
+                    <p class="text-center">The system is composed of a Python backend that handles all logic and a web-based frontend for user interaction.</p>
+                    <pre><code>+-------------------+      +--------------------+      +-----------------------+
+|   Web Dashboard   |&lt;----&gt;|   Flask API Server |&lt;----&gt;|   MT5 Terminal        |
++-------------------+      +--------------------+      +-----------------------+
+                                     |
+                                (Manages)
+                                     v
++-----------------------------------------------------------------------------+
+|                          TradingBot Core (main.py)                          |
++-----------------------------------------------------------------------------+</code></pre>
+
+                    <h4>Component Breakdown</h4>
+                    <ul class="list-disc list-inside text-left max-w-xl mx-auto">
+                        <li><code>app.py</code>: The entry point. Runs a Flask web server that provides the API endpoints.</li>
+                        <li><code>main.py</code>: Contains the <code>TradingBot</code> class, the core of the system.</li>
+                        <li><code>strategies/</code>: Directory containing Python classes for each trading strategy.</li>
+                        <li><code>ml_model.py</code>: Contains the <code>MLValidator</code> class for ML model logic.</li>
+                        <li><code>utils/</code>: Directory for helper modules like <code>mt5_connection.py</code> and <code>db_connector.py</code>.</li>
+                    </ul>
+
+                    <h4>Technology Stack</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 text-left">
+                        <div class="p-4 bg-white rounded-lg border border-slate-200"><h5 class="!mt-0 !mb-2 font-bold text-lg text-slate-800 text-center">Languages & Frameworks</h5><p class="text-slate-600 !mb-0 text-center">Python, Flask, JavaScript, HTML, CSS, Tailwind CSS</p></div>
+                        <div class="p-4 bg-white rounded-lg border border-slate-200"><h5 class="!mt-0 !mb-2 font-bold text-lg text-slate-800 text-center">Data & Machine Learning</h5><p class="text-slate-600 !mb-0 text-center">Pandas, NumPy, Scikit-learn, XGBoost</p></div>
+                        <div class="p-4 bg-white rounded-lg border border-slate-200"><h5 class="!mt-0 !mb-2 font-bold text-lg text-slate-800 text-center">Database & Integration</h5><p class="text-slate-600 !mb-0 text-center">MongoDB, MetaTrader5 Library</p></div>
+                        <div class="p-4 bg-white rounded-lg border border-slate-200"><h5 class="!mt-0 !mb-2 font-bold text-lg text-slate-800 text-center">Visualization & Testing</h5><p class="text-slate-600 !mb-0 text-center">Chart.js, backtesting.py</p></div>
+                    </div>
+
+                    <h4 class="mt-8">Setup and Installation</h4>
+                    <h5>Step-by-Step Guide</h5>
+                    <ol class="list-decimal list-inside space-y-4 text-left max-w-3xl mx-auto">
+                        <li>
+                            <strong>Clone Repository:</strong>
+                            <pre><code>git clone &lt;your-repository-url&gt;
+cd &lt;repository-folder&gt;</code></pre>
+                        </li>
+                        <li>
+                            <strong>Create Virtual Environment:</strong>
+                            <pre><code># On Windows
+python -m venv venv && venv\Scripts\activate
+
+# On macOS/Linux
+python3 -m venv venv && source venv/bin/activate</code></pre>
+                        </li>
+                        <li>
+                            <strong>Install Dependencies:</strong> Create <code>requirement.txt</code> and run:
+                            <pre><code>pip install -r requirement.txt</code></pre>
+                        </li>
+                        <li>
+                            <strong>Configure Environment:</strong> Create a <code>.env</code> file for your MongoDB connection string:
+                            <pre><code>MONGO_URI="your_mongodb_connection_string"</code></pre>
+                        </li>
+                         <li>
+                            <strong>Configure Bot:</strong> Edit <code>config/config.json</code> and fill in your <code>mt5_credentials</code>.
+                        </li>
+                    </ol>
+
+                    <h4 class="mt-8">Running the Bot</h4>
+                     <ol class="list-decimal list-inside space-y-4 text-left max-w-3xl mx-auto">
+                         <li><strong>Start Services:</strong> Ensure MongoDB is running. Launch the MT5 terminal and log in. In MT5, enable "Allow algorithmic trading" under <code>Tools > Options > Expert Advisors</code>.</li>
+                         <li>
+                            <strong>Run Backend:</strong> Activate your virtual environment and run:
+                             <pre><code>python app.py</code></pre>
+                        </li>
+                         <li><strong>Access Frontend:</strong> Open a web browser and navigate to <code>http://127.0.0.1:5000</code>.</li>
+                         <li><strong>Start Trading:</strong> Use the "START BOT" button on the dashboard to begin live operation.</li>
+                     </ol>
+                </section>
+
+                <section id="requirements">
+                    <h3 class="text-2xl">14. Requirements Analysis</h3>
+                     <h4>Functional Requirements</h4>
+                     <ul class="list-disc list-inside text-left max-w-lg mx-auto">
+                        <li>The system shall connect to an MT5 account.</li>
+                        <li>The system shall fetch real-time market data.</li>
+                        <li>The system shall use an ML model to approve or reject trade signals.</li>
+                        <li>The system shall execute market orders with calculated SL/TP.</li>
+                     </ul>
+                    <h4 class="mt-6">Non-Functional Requirements</h4>
+                     <ul class="list-disc list-inside text-left max-w-lg mx-auto">
+                        <li><strong>Performance:</strong> A full analysis cycle must complete within the configured interval.</li>
+                        <li><strong>Reliability:</strong> The application must handle connection drops gracefully.</li>
+                        <li><strong>Usability:</strong> The web dashboard must be responsive and intuitive.</li>
+                     </ul>
+                </section>
+
+                <section id="testing">
+                    <h3 class="text-2xl">15. Test Strategy</h3>
+                     <ul class="list-disc list-inside text-left max-w-lg mx-auto">
+                        <li><strong>Unit Testing:</strong> Individual functions are tested in isolation.</li>
+                        <li><strong>Integration Testing:</strong> The connections between the backend, bot core, and MT5 are tested.</li>
+                        <li><strong>System Testing:</strong> The application is run end-to-end on a demo account.</li>
+                        <li><strong>User Acceptance Testing (UAT):</strong> Stakeholders test the dashboard and bot functionality.</li>
+                     </ul>
+                </section>
+
+                <div id="main-documentation-content">
+                    <section id="config-guide-user">
+                         <h3 class="text-2xl">16. Configuration Guide</h3>
+                         <p class="text-center">The <code>config.json</code> file controls all aspects of the bot. Below is a guide to the key parameters available in the UI and file.</p>
+                         <div id="accordion-container" class="space-y-3 mt-6"></div>
+                    </section>
+                    <section id="strategies-explained-user">
+                        <h3 class="text-2xl">17. Trading Strategies Explained</h3>
+                        <div class="space-y-6 text-left max-w-3xl mx-auto">
+                            <div><h5>SMA (Simple Moving Average)</h5><p>A classic trend-following strategy that generates a `buy` signal on a "golden cross" (short-term MA crosses above long-term MA) and a `sell` signal on a "death cross".</p></div>
+                            <div><h5>Bollinger Bands</h5><p>A mean-reversion strategy. It sells when price touches the upper band and buys when it touches the lower band, assuming a return to the average.</p></div>
+                            <div><h5>Keltner Channels</h5><p>A breakout strategy based on volatility. It generates a `buy` signal when the price closes above the upper channel and a `sell` signal when it closes below the lower channel.</p></div>
+                            <div><h5>ADX (Average Directional Index)</h5><p>A trend-strength strategy. It only generates signals when the ADX value is above a certain threshold (indicating a strong trend) and the Directional Indicators (+DI, -DI) confirm the trend's direction.</p></div>
+                            <div><h5>Fibonacci Retracement</h5><p>This strategy identifies recent significant swing highs and lows to map out a price range. It then generates signals when the price retraces to a key Fibonacci level (e.g., 38.2%, 50%, 61.8%) and shows signs of reversing in the direction of the primary trend.</p></div>
+                            <div><h5>Liquidity Sweep</h5><p>A price action strategy that looks for instances where price briefly moves past a recent swing high or low (sweeping liquidity) and then quickly reverses, signaling a potential entry in the direction of the reversal, confirmed by volume.</p></div>
+                            <div><h5>SMC (Smart Money Concepts)</h5><p>An advanced strategy that identifies high-probability zones based on institutional trading concepts. It looks for Order Blocks (OB) and Fair Value Gaps (FVG) and aims to enter trades in alignment with a confirmed higher-timeframe trend.</p></div>
+                            <div><h5>Malaysian SnR</h5><p>A unique Support and Resistance strategy that identifies "fresh" price levels that have not been recently tested. It generates signals when the price returns to and reacts to these significant, untested zones.</p></div>
+                        </div>
+                    </section>
+
+                    <section id="final-report">
+                    <h2 class="text-3xl">18. Final Deep Dive Report</h2>
+                    <p class="text-center">For an exhaustive analysis, including detailed backtest results, ML model performance metrics, and feature importance breakdowns, please view the complete report document.</p>
+                    <div class="mt-6 text-center">
+                        <a href="./report.html" class="cta-button">
+                            View Full Report
+                        </a>
+                    </div>
+                </section>
+
+                <section id="conclusion">
+                    <h2 class="text-3xl">Project Conclusion</h2>
+                    <p class="text-center">The TradePilot project successfully integrates a multi-layered system of classical trading strategies with modern machine learning validation. It provides a robust, configurable, and user-friendly framework for automated trading on the MT5 platform. The project stands as a testament to the power of combining domain expertise with data-driven AI to navigate complex financial markets.</p>
+                </section>
+
+                </div>
+            </main>
+
+            <aside class="hidden lg:block lg:col-span-3">
+                <nav id="aside-nav" class="sticky top-24">
+                    <h3 class="font-semibold text-slate-800 mb-2">On This Page</h3>
+                    <ul class="space-y-2 text-sm">
+                        <!-- Desktop nav links will be injected here by JavaScript -->
+                    </ul>
+                </nav>
+            </aside>
+        </div>
+    </div>
+
+     <footer class="text-center mt-16 py-8 border-t border-slate-200">
+         <p class="text-sm text-slate-500">© 2025 TradePilot Project. All Rights Reserved.</p>
+         <p class="text-xs text-slate-400 mt-2">Trading involves substantial risk. All data presented is for illustrative purposes only.</p>
+     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elements ---
+            const mainContent = document.querySelector('.main-content');
+            const asideNavUl = document.querySelector('#aside-nav ul');
+            const mobileNavContent = document.getElementById('mobile-nav-content');
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const closeMenuButton = document.getElementById('close-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+            const sections = mainContent.querySelectorAll('section');
+            const navLinksMap = new Map();
+
+            // --- Sidebar Logic ---
+            const openSidebar = () => {
+                mobileMenu.classList.remove('-translate-x-full');
+                mobileMenuOverlay.classList.remove('hidden');
+                document.body.classList.add('menu-open');
+            };
+
+            const closeSidebar = () => {
+                mobileMenu.classList.add('-translate-x-full');
+                mobileMenuOverlay.classList.add('hidden');
+                document.body.classList.remove('menu-open');
+            };
+
+            mobileMenuButton.addEventListener('click', openSidebar);
+            closeMenuButton.addEventListener('click', closeSidebar);
+            mobileMenuOverlay.addEventListener('click', closeSidebar);
+
+            // --- Dynamic Navigation Link Population ---
+            sections.forEach(section => {
+                const titleEl = section.querySelector('h1, h2, h3');
+                if (!titleEl) return;
+
+                const title = titleEl.textContent;
+                const id = section.getAttribute('id');
+                if (!id) return;
+
+                // Create Desktop Link
+                const asideLink = document.createElement('a');
+                asideLink.href = `#${id}`;
+                asideLink.textContent = title;
+                asideLink.className = 'block border-l-2 border-slate-200 pl-4 py-1 text-slate-500 hover:text-blue-600 hover:border-blue-600';
+                const asideLi = document.createElement('li');
+                asideLi.appendChild(asideLink);
+                if (asideNavUl) {
+                    asideNavUl.appendChild(asideLi);
+                }
+
+
+                // Create Mobile Link
+                const mobileLink = document.createElement('a');
+                mobileLink.href = `#${id}`;
+                mobileLink.textContent = title;
+                mobileLink.className = 'block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-slate-700 hover:text-white';
+                if (mobileNavContent) {
+                    mobileNavContent.appendChild(mobileLink);
+                }
+
+
+                navLinksMap.set(id, { aside: asideLink, mobile: mobileLink });
+            });
+
+            // --- Smooth Scrolling & Active Link Highlighting ---
+            const allNavLinks = document.querySelectorAll('a[href^="#"]');
+            allNavLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetEl = document.querySelector(this.getAttribute('href'));
+                    if (targetEl) {
+                        closeSidebar(); // Close sidebar on link click
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // Intersection Observer for active link
+            const observer = new IntersectionObserver((entries) => {
+                let mostVisibleSectionId = null;
+                let maxRatio = 0;
+
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+                        maxRatio = entry.intersectionRatio;
+                        mostVisibleSectionId = entry.target.getAttribute('id');
+                    }
+                });
+
+                if (mostVisibleSectionId) {
+                     navLinksMap.forEach((links, id) => {
+                        if (id === mostVisibleSectionId) {
+                            links.aside.classList.add('active');
+                        } else {
+                            links.aside.classList.remove('active');
+                        }
+                    });
+                }
+
+            }, { rootMargin: "-20% 0px -70% 0px", threshold: 0.5 });
+
+            sections.forEach(section => {
+                if (section.id) {
+                     observer.observe(section);
+                }
+            });
+
+            // --- Accordion Logic for Configuration Guide ---
+            const settingsData = [
+                {
+                    category: 'General Bot Operation',
+                    settings: [
+                        { param: 'monitoring_interval_seconds', desc: 'The time in seconds the bot waits between each full analysis cycle.'},
+                        { param: 'cooldown_period_minutes', desc: 'The time in minutes the bot will wait before opening a new trade on the *same symbol* after a trade is closed.'}
+                    ]
+                },
+                {
+                    category: 'Risk Management',
+                    settings: [
+                        { param: 'risk_percent_per_trade', desc: 'The percentage of the total account balance to risk on any single trade.'},
+                        { param: 'max_consecutive_losses', desc: 'If this many trades in a row result in a loss, the bot will pause all new trading activity.'}
+                    ]
+                },
+                 {
+                    category: 'Machine Learning',
+                    settings: [
+                        { param: 'ml_model_type', desc: 'Selects the model for trade validation. Options: "RandomForest" or "XGBoost".'},
+                        { param: 'ml_confidence_thresholds', desc: 'The minimum probability score (e.g., 0.55) the ML model must predict for a trade signal to be approved.'}
+                    ]
+                }
+            ];
+
+            const accordionContainer = document.getElementById('accordion-container');
+            if(accordionContainer){
+                settingsData.forEach((group) => {
+                    const groupEl = document.createElement('div');
+                    groupEl.className = 'bg-white border border-slate-200 rounded-lg overflow-hidden';
+                    const headerEl = document.createElement('button');
+                    headerEl.className = 'accordion-header w-full p-4 text-left font-bold text-lg text-slate-800 flex justify-between items-center transition-colors hover:bg-slate-50';
+                    headerEl.innerHTML = `<span>${group.category}</span><span class="accordion-icon transform transition-transform text-blue-600">▶</span>`;
+                    const contentEl = document.createElement('div');
+                    contentEl.className = 'accordion-content';
+                    const contentInner = document.createElement('div');
+                    contentInner.className = 'p-4 border-t border-slate-200';
+                    const table = document.createElement('table');
+                    table.className = 'w-full text-sm text-left';
+                    table.innerHTML = `<thead><tr class="bg-slate-50"><th class="p-2 font-semibold">Parameter</th><th class="p-2 font-semibold">Description</th></tr></thead><tbody></tbody>`;
+                    const tbody = table.querySelector('tbody');
+                    group.settings.forEach(setting => {
+                        const row = tbody.insertRow();
+                        row.className = 'border-b border-slate-100 last:border-b-0';
+                        row.innerHTML = `<td class="p-2 align-top"><code class="bg-slate-200 text-slate-800 p-1 rounded font-mono">${setting.param}</code></td><td class="p-2 align-top">${setting.desc}</td>`;
+                    });
+                    contentInner.appendChild(table);
+                    contentEl.appendChild(contentInner);
+                    groupEl.appendChild(headerEl);
+                    groupEl.appendChild(contentEl);
+                    accordionContainer.appendChild(groupEl);
+                    headerEl.addEventListener('click', () => {
+                        const icon = headerEl.querySelector('.accordion-icon');
+                        if (contentEl.style.maxHeight) {
+                            contentEl.style.maxHeight = null;
+                            icon.style.transform = 'rotate(0deg)';
+                        } else {
+                            contentEl.style.maxHeight = contentEl.scrollHeight + "px";
+                            icon.style.transform = 'rotate(90deg)';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

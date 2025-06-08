@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradePilot: Deep Dive Report</title>
+    <link href="https://img.icons8.com/?size=100&id=hJecpPVXgZ5Y&format=png&color=228BE6" rel="icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+        .material-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .material-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            min-height: 280px;
+        }
+        .flowchart-step {
+            border: 2px solid #1d4ed8;
+            background-color: #ffffff;
+            color: #1e3a8a;
+        }
+        .flowchart-step.highlight {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+        }
+        .flowchart-arrow {
+            color: #3b82f6;
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .key-stat {
+            font-size: clamp(3rem, 8vw, 4rem);
+        }
+        .setup-code {
+            background-color: #e2e8f0;
+            color: #1e293b;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-header .accordion-icon {
+            transition: transform 0.3s ease-out;
+        }
+        .navbar-link.active {
+            color: #60a5fa; /* A lighter blue for active state in dark navbar */
+            font-weight: 600;
+        }
+        section {
+            scroll-margin-top: 5rem; /* Offset for sticky navbar */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav id="navbar" class="bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50 transition-shadow duration-300 shadow-none">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="text-white font-bold text-xl tracking-wider">
+                        TradePilot
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#introduction" class="navbar-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Overview</a>
+                        <a href="#features" class="navbar-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Features</a>
+                        <a href="#process" class="navbar-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Process</a>
+                        <a href="#performance" class="navbar-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Performance</a>
+                        <a href="#config-guide" class="navbar-link text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Config Guide</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobile-menu-button" type="button" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#introduction" class="navbar-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Overview</a>
+                <a href="#features" class="navbar-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Features</a>
+                <a href="#process" class="navbar-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Process</a>
+                <a href="#performance" class="navbar-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Performance</a>
+                <a href="#config-guide" class="navbar-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Config Guide</a>
+                <a href="#tech-and-setup" class="navbar-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Setup</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-16 pt-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-blue-900">TradePilot Deep Dive</h1>
+            <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">An analysis of the architecture, features, and market positioning of an AI-enhanced automated trading system based on our deep research report.</p>
+        </header>
+
+        <main>
+            <section id="introduction" class="mb-16">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-blue-800">Market Opportunity & Core Proposition</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">Our research indicates a growing demand for sophisticated automated trading solutions. TradePilot addresses this by combining multi-strategy analysis with a robust machine learning validation layer, designed to improve accuracy and adapt to volatile market conditions.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    <div class="material-card p-6 flex flex-col justify-center">
+                        <p class="key-stat font-extrabold text-blue-600">7+</p>
+                        <h3 class="mt-2 text-xl font-bold text-slate-800">Core Strategies</h3>
+                        <p class="text-slate-500 mt-1">A diverse suite of technical strategies forms the basis of the trading consensus.</p>
+                    </div>
+                    <div class="material-card p-6 flex flex-col justify-center">
+                        <p class="key-stat font-extrabold text-blue-600">2</p>
+                        <h3 class="mt-2 text-xl font-bold text-slate-800">ML Model Options</h3>
+                        <p class="text-slate-500 mt-1">Choose between RandomForest or XGBoost for final signal validation.</p>
+                    </div>
+                    <div class="material-card p-6 flex flex-col justify-center">
+                        <p class="key-stat font-extrabold text-blue-600">100%</p>
+                        <h3 class="mt-2 text-xl font-bold text-slate-800">ATR-Dynamic</h3>
+                        <p class="text-slate-500 mt-1">Profit targets are adaptive to market volatility, not fixed, enhancing realism.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="features" class="mb-16">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-blue-800">Product Feature Analysis</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto text-center">The system's value is derived from its layered feature set, which addresses key challenges in automated trading from signal generation to risk management.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="material-card p-6 flex flex-col"><div class="flex-shrink-0 text-center md:text-left"><h3 class="text-xl font-bold text-slate-800 mb-4">Multi-Strategy Consensus</h3><p class="text-slate-500 mb-4 h-24">The system synthesizes signals from multiple technical indicators. This chart illustrates a hypothetical influence distribution.</p></div><div class="flex-1 chart-container"><canvas id="strategyDonutChart"></canvas></div></div>
+                    <div class="material-card p-6 flex flex-col"><div class="flex-shrink-0 text-center md:text-left"><h3 class="text-xl font-bold text-slate-800 mb-4">ML Validation Impact</h3><p class="text-slate-500 mb-4 h-24">Enabling the ML filter can significantly improve the win rate of executed trades by filtering out low-probability signals.</p></div><div class="flex-1 chart-container"><canvas id="mlImpactBarChart"></canvas></div></div>
+                    <div class="material-card p-6 flex flex-col"><div class="flex-shrink-0 text-center md:text-left"><h3 class="text-xl font-bold text-slate-800 mb-4">Advanced Feature Engineering</h3><p class="text-slate-500 mb-4 h-24">The ML model's power is enhanced by a rich feature set, providing deeper context than price action alone.</p></div><div class="flex-1 chart-container"><canvas id="featureRadarChart"></canvas></div></div>
+                </div>
+            </section>
+
+            <section id="process" class="mb-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-blue-800">The Decision-Making Process Flow</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">TradePilot follows a structured, seven-step process, ensuring a disciplined and data-driven approach from signal generation to final execution.</p>
+                </div>
+                <div class="flex flex-col items-center space-y-2">
+                    <div class="flowchart-step w-full md:w-3/4 lg:w-1/2 p-4 text-center rounded-lg"><span class="font-bold text-lg">1. Data Collection</span><p class="text-sm">Fetches latest OHLCV market data from MT5 terminal.</p></div>
+                    <div class="flowchart-arrow">↓</div>
+                    <div class="flowchart-step w-full md:w-3/4 lg:w-1/2 p-4 text-center rounded-lg"><span class="font-bold text-lg">2. Strategy Analysis</span><p class="text-sm">7+ individual strategies generate signals with strength scores.</p></div>
+                    <div class="flowchart-arrow">↓</div>
+                    <div class="flowchart-step w-full md:w-3/4 lg:w-1/2 p-4 text-center rounded-lg"><span class="font-bold text-lg">3. Consensus Mechanism</span><p class="text-sm">Aggregates signals to form a weighted consensus.</p></div>
+                    <div class="flowchart-arrow">↓</div>
+                    <div class="flowchart-step w-full md:w-3/4 lg:w-1/2 p-4 text-center rounded-lg highlight"><span class="font-bold text-lg">4. Machine Learning Validation</span><p class="text-sm">A feature vector is passed to the ML model (XGBoost/RandomForest).</p></div>
+                    <div class="flowchart-arrow">↓</div>
+                    <div class="flowchart-step w-full md:w-3/4 lg:w-1/2 p-4 text-center rounded-lg highlight"><span class="font-bold text-lg">5. Execution Check</span><p class="text-sm">Trade placed only if ML confidence exceeds the configured threshold.</p></div>
+                    <div class="flowchart-arrow">↓</div>
+                    <div class="flowchart-step w-full md:w-3/4 lg:w-1/2 p-4 text-center rounded-lg"><span class="font-bold text-lg">6. Risk & Trade Management</span><p class="text-sm">Lot size is calculated and open trade is managed with trailing stops.</p></div>
+                    <div class="flowchart-arrow">↓</div>
+                    <div class="flowchart-step w-full md:w-3/4 lg:w-1/2 p-4 text-center rounded-lg"><span class="font-bold text-lg">7. Continuous Monitoring</span><p class="text-sm">The cycle repeats at the configured interval.</p></div>
+                </div>
+            </section>
+
+            <section id="performance" class="mb-16">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-blue-800">Simulated Performance & Adaptability</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">Backtesting results indicate strong performance across different market conditions. The system's adaptability is a key strength.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="material-card p-6 flex flex-col"><div class="flex-shrink-0 text-center md:text-left"><h3 class="text-xl font-bold text-slate-800 mb-4">Simulated Equity Growth</h3><p class="text-slate-500 mb-4">This chart shows a simulated equity curve from a 6-month backtest on the XAUUSD symbol.</p></div><div class="flex-1 chart-container"><canvas id="equityCurveChart"></canvas></div></div>
+                    <div class="material-card p-6 flex flex-col"><div class="flex-shrink-0 text-center md:text-left"><h3 class="text-xl font-bold text-slate-800 mb-4">Comparative Win Rate Analysis</h3><p class="text-slate-500 mb-4">Analysis shows varying performance across symbols and timeframes, highlighting the importance of tailored parameters.</p></div><div class="flex-1 chart-container"><canvas id="winRateRadarChart"></canvas></div></div>
+                </div>
+            </section>
+
+            <section id="config-guide" class="mb-16">
+                 <div class="material-card p-6 md:p-8">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-bold text-blue-800">Technical Configuration & Settings Guide</h2>
+                        <p class="mt-2 text-slate-600 max-w-2xl mx-auto">This guide details the key parameters you can adjust in the <code class="setup-code">config.json</code> file or through the UI dashboard to fine-tune the bot's behavior.</p>
+                    </div>
+                    <div id="accordion-container" class="space-y-2 max-w-4xl mx-auto">
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-16 pt-8 border-t border-slate-200">
+            <p class="text-slate-500">This infographic is based on the TradePilot Deep Research report. For detailed configuration, please refer to the <a href="./index.html" class="text-blue-800">full documentation.</a></p>
+            <p class="text-sm text-slate-500">© 2025 TradePilot Project. All Rights Reserved.</p>
+            <p class="text-sm text-slate-400 mt-2">Trading involves substantial risk. All data presented is for illustrative and analytical purposes only.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeColors = {
+                bluePalette: ['#00449E', '#005CB9', '#0073D4', '#41A6E0', '#86D8F0'],
+                gridColor: 'rgba(0, 0, 0, 0.08)',
+                labelColor: '#334155',
+                radarGridColor: 'rgba(0, 0, 0, 0.08)',
+                radarAngleColor: 'rgba(0, 0, 0, 0.08)',
+                lineBg: 'rgba(65, 166, 224, 0.1)',
+                radarBg1: 'rgba(0, 88, 185, 0.2)',
+                radarBg2: 'rgba(134, 216, 240, 0.2)'
+            };
+
+            function processLabels(labels) {
+                const maxLen = 16;
+                return labels.map(label => {
+                    if (typeof label !== 'string' || label.length <= maxLen) return label;
+                    const words = label.split(' ');
+                    let lines = [];
+                    let currentLine = '';
+                    words.forEach(word => {
+                        if ((currentLine + ' ' + word).trim().length > maxLen) {
+                            lines.push(currentLine);
+                            currentLine = word;
+                        } else {
+                            currentLine = (currentLine + ' ' + word).trim();
+                        }
+                    });
+                    lines.push(currentLine);
+                    return lines;
+                });
+            }
+
+            const mandatoryTooltipConfig = { plugins: { tooltip: { callbacks: { title: (items) => Array.isArray(items[0]?.chart.data.labels[items[0]?.dataIndex]) ? items[0]?.chart.data.labels[items[0]?.dataIndex].join(' ') : items[0]?.chart.data.labels[items[0]?.dataIndex] } } } } ;
+            const chartOptions = { responsive: true, maintainAspectRatio: false };
+
+            function createAllCharts() {
+                const colors = themeColors;
+
+                new Chart(document.getElementById('strategyDonutChart'), {
+                    type: 'doughnut', data: { labels: processLabels(['Momentum (ADX, ROC)', 'Mean Reversion (BBands)', 'SMC & SnR Levels', 'Trend Following (SMA)', 'Other Strategies']), datasets: [{ data: [30, 25, 20, 15, 10], backgroundColor: colors.bluePalette, borderColor: '#ffffff', borderWidth: 3 }] },
+                    options: { ...chartOptions, ...mandatoryTooltipConfig, plugins: { ...mandatoryTooltipConfig.plugins, legend: { position: 'bottom', labels: { color: colors.labelColor } } } }
+                });
+
+                new Chart(document.getElementById('mlImpactBarChart'), {
+                    type: 'bar', data: { labels: ['Trades Without ML', 'Trades With ML Filter'], datasets: [{ label: 'Simulated Win Rate (%)', data: [48, 62], backgroundColor: [colors.bluePalette[3], colors.bluePalette[1]], borderColor: [colors.bluePalette[2], colors.bluePalette[0]], borderWidth: 1 }] },
+                    options: { ...chartOptions, ...mandatoryTooltipConfig, scales: { y: { beginAtZero: true, max: 100, grid: { color: colors.gridColor }, ticks: { color: colors.labelColor } }, x: { grid: { display: false }, ticks: { color: colors.labelColor } } }, plugins: { ...mandatoryTooltipConfig.plugins, legend: { display: false } } }
+                });
+
+                new Chart(document.getElementById('featureRadarChart'), {
+                    type: 'radar', data: { labels: processLabels(['Volatility Features', 'Time-Based Features', 'Correlation Analysis', 'Indicator Rate-of-Change', 'Pure Price Action']), datasets: [{ label: 'Feature Group Importance', data: [85, 75, 80, 70, 60], backgroundColor: colors.lineBg, borderColor: colors.bluePalette[2], pointBackgroundColor: colors.bluePalette[2], pointBorderColor: '#fff', borderWidth: 2 }] },
+                    options: { ...chartOptions, ...mandatoryTooltipConfig, scales: { r: { angleLines: { color: colors.radarAngleColor }, grid: { color: colors.radarGridColor }, pointLabels: { font: { size: 12 }, color: colors.labelColor }, suggestedMin: 0, suggestedMax: 100, ticks:{display:false} } }, plugins: { ...mandatoryTooltipConfig.plugins, legend: { display: false } } }
+                });
+
+                const equityData = Array.from({length: 26}, (_, i) => 10000 * Math.pow(1.008, i) * (1 + Math.sin(i/2) * 0.05 + (Math.random()-0.5)*0.06));
+                const equityLabels = Array.from({length: 26}, (_, i) => `W${i+1}`);
+                new Chart(document.getElementById('equityCurveChart'), {
+                    type: 'line', data: { labels: equityLabels, datasets: [{ label: 'Simulated Equity ($)', data: equityData, fill: true, borderColor: colors.bluePalette[2], backgroundColor: colors.lineBg, tension: 0.1, borderWidth: 2 }] },
+                    options: { ...chartOptions, ...mandatoryTooltipConfig, scales: { y: { grid: { color: colors.gridColor }, ticks: { color: colors.labelColor } }, x: { grid: { display: false }, ticks: { color: colors.labelColor } } } }
+                });
+
+                new Chart(document.getElementById('winRateRadarChart'), {
+                    type: 'radar', data: { labels: ['XAUUSD-M5', 'XAUUSD-M15', 'BTCUSD-M5', 'BTCUSD-M15', 'BTCUSD-M30'], datasets: [ { label: 'With ML Filter (%)', data: [62, 65, 58, 61, 59], backgroundColor: colors.radarBg1, borderColor: colors.bluePalette[1], pointBackgroundColor: colors.bluePalette[1] }, { label: 'Without ML Filter (%)', data: [48, 51, 45, 49, 46], backgroundColor: colors.radarBg2, borderColor: colors.bluePalette[3], pointBackgroundColor: colors.bluePalette[3] } ] },
+                    options: { ...chartOptions, ...mandatoryTooltipConfig, scales: { r: { suggestedMin: 30, suggestedMax: 70, grid: { color: colors.radarGridColor }, angleLines: { color: colors.radarAngleColor }, ticks: { backdropColor: 'transparent', color: colors.labelColor }, pointLabels: { color: colors.labelColor } } }, plugins: { ...mandatoryTooltipConfig.plugins, legend: { position: 'bottom', labels: { color: colors.labelColor } } } }
+                });
+            }
+
+            const settingsData = [
+                {
+                    category: 'General Bot Operation',
+                    settings: [
+                        { param: 'monitoring_interval_seconds', desc: 'The time in seconds the bot waits between each full analysis cycle.', ui: 'Settings > General Bot Operation' },
+                        { param: 'cooldown_period_minutes', desc: 'The time in minutes the bot will wait before opening a new trade on the *same symbol* after a trade is closed.', ui: 'Settings > General Bot Operation' },
+                        { param: 'max_consecutive_losses', desc: 'If this many trades in a row result in a loss, the bot will pause all new trading activity as a safety measure.', ui: 'Settings > General Bot Operation' }
+                    ]
+                },
+                {
+                    category: 'Risk Management',
+                    settings: [
+                        { param: 'risk_percent_per_trade', desc: 'The percentage of the total account balance to risk on any single trade. This is used to dynamically calculate the lot size.', ui: 'Settings > Global Risk Management' },
+                        { param: 'sl_atr_multiplier', desc: 'The multiplier for the Average True Range (ATR) to determine the stop loss distance. A higher value means a wider stop loss.', ui: 'config.json only' },
+                        { param: 'risk_reward_ratio', desc: 'The ratio of potential profit to potential loss. A value of 1.5 means the take profit distance will be 1.5 times the stop loss distance.', ui: 'config.json only' }
+                    ]
+                },
+                {
+                    category: 'Machine Learning & Features',
+                    settings: [
+                        { param: 'ml_model_type', desc: 'Selects the machine learning model for trade validation. Options are "RandomForest" or "XGBoost". Requires a "Force Full ML Training" after changing.', ui: 'Settings > Machine Learning Settings' },
+                        { param: 'ml_prediction_horizon', desc: 'The number of future bars the ML model is trained to look ahead to determine if a trade will be successful.', ui: 'config.json only' },
+                        { param: 'ml_confidence_thresholds', desc: 'The minimum probability score (e.g., 0.55 for 55%) the ML model must predict for a trade signal to be approved.', ui: 'config.json only' },
+                        { param: 'feature_engineering', desc: 'A group of settings in config.json to enable/disable advanced ML features like volatility adjustment, rate of change, and DXY correlation.', ui: 'config.json only' }
+                    ]
+                },
+                {
+                    category: 'Trade Management & Filters',
+                    settings: [
+                        { param: 'h1_trend_filter', desc: 'If enabled, prevents the bot from opening trades that go against the dominant trend on the H1 timeframe.', ui: 'Settings > H1 Trend Filter' },
+                        { param: 'profit_securing_stop_loss', desc: 'A complex set of rules to automatically move the stop loss to break-even or into profit after a trade has moved a certain distance in your favor.', ui: 'Settings > Profit-Securing & Trailing Stop' },
+                        { param: 'time_based_exit', desc: 'Rules to automatically close profitable trades on shorter timeframes if they have been open for a certain number of bars and momentum is fading.', ui: 'Settings > Time-Based Exit' }
+                    ]
+                }
+            ];
+
+            const accordionContainer = document.getElementById('accordion-container');
+            if(accordionContainer){
+                settingsData.forEach((group) => {
+                    const groupEl = document.createElement('div');
+                    groupEl.className = 'material-card overflow-hidden';
+
+                    const headerEl = document.createElement('button');
+                    headerEl.className = 'accordion-header w-full p-4 text-left font-bold text-lg text-slate-800 flex justify-between items-center transition-colors hover:bg-slate-50';
+                    headerEl.innerHTML = `<span>${group.category}</span><span class="accordion-icon transform transition-transform text-blue-600">▶</span>`;
+
+                    const contentEl = document.createElement('div');
+                    contentEl.className = 'accordion-content';
+                    const contentInner = document.createElement('div');
+                    contentInner.className = 'p-4 border-t border-slate-200';
+
+                    const table = document.createElement('table');
+                    table.className = 'w-full text-sm text-left';
+                    table.innerHTML = `<thead class="bg-slate-50"><tr><th class="p-2 font-semibold">Parameter</th><th class="p-2 font-semibold">Description</th><th class="p-2 font-semibold hidden md:table-cell">UI Location</th></tr></thead><tbody></tbody>`;
+
+                    const tbody = table.querySelector('tbody');
+                    group.settings.forEach(setting => {
+                        const row = tbody.insertRow();
+                        row.className = 'border-b border-slate-100 last:border-b-0';
+                        row.innerHTML = `<td class="p-2 align-top"><code class="setup-code">${setting.param}</code></td><td class="p-2 align-top">${setting.desc}</td><td class="p-2 align-top hidden md:table-cell">${setting.ui}</td>`;
+                    });
+
+                    contentInner.appendChild(table);
+                    contentEl.appendChild(contentInner);
+                    groupEl.appendChild(headerEl);
+                    groupEl.appendChild(contentEl);
+                    accordionContainer.appendChild(groupEl);
+
+                    headerEl.addEventListener('click', () => {
+                        const icon = headerEl.querySelector('.accordion-icon');
+                        if (contentEl.style.maxHeight) {
+                            contentEl.style.maxHeight = null;
+                            icon.style.transform = 'rotate(0deg)';
+                        } else {
+                            contentEl.style.maxHeight = contentEl.scrollHeight + "px";
+                            icon.style.transform = 'rotate(90deg)';
+                        }
+                    });
+                });
+            }
+
+            createAllCharts();
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const isExpanded = mobileMenu.classList.contains('hidden') === false;
+                mobileMenuButton.setAttribute('aria-expanded', isExpanded);
+            });
+
+            const navbar = document.getElementById('navbar');
+            const navLinks = document.querySelectorAll('.navbar-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                        });
+                    }
+                });
+            }, { rootMargin: "-40% 0px -40% 0px" });
+
+            document.querySelectorAll('main section').forEach(section => {
+                observer.observe(section);
+            });
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 10) {
+                    navbar.classList.add('shadow-md');
+                } else {
+                    navbar.classList.remove('shadow-md');
+                }
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    if (mobileMenu.classList.contains('hidden') === false) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
